@@ -76,10 +76,13 @@ impl PtyReader {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Command {
     cmd: String,
     args: Vec<String>,
     env: Vec<(String, String)>,
+    #[serde(default)]
+    clear_env: bool,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -107,6 +110,9 @@ impl Pty {
         })?;
 
         let mut cmd = CommandBuilder::new(command.cmd);
+        if command.clear_env {
+            cmd.env_clear();
+        }
         // https://github.com/wez/wezterm/issues/4205
         cmd.env("PATH", std::env::var("PATH")?);
         cmd.args(&command.args);
@@ -357,6 +363,7 @@ mod tests {
                     cmd: "deno".into(),
                     args: vec!["repl".into()],
                     env: vec![("NO_COLOR".into(), "1".into())],
+                    clear_env: false,
                 })
                 .unwrap();
 

@@ -10,6 +10,8 @@ export interface Command {
   args: string[];
   /** The environment variables for the command. */
   env: [string, string][];
+  /** Clear environmental variables from parent process. */
+  clearEnv?: boolean;
 }
 
 /**
